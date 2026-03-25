@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ question.question_text }}</h2>
+
+{% if question.image_url %}
+  <div style="margin-bottom: 15px;">
+    <img src="{{ question.image_url }}" alt="{{ question.question_text }}" style="max-width: 100%; border-radius: 8px; max-height: 400px; object-fit: cover;">
+  </div>
+{% endif %}{% if question.end_date %}
+  <p><small>Expires on: {{ question.end_date }}</small></p>
+{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+{% csrf_token %}
+{% for choice in question.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+{% endfor %}
+<br>
+<input type="submit" value="Vote">
+</form>
+
+<hr>
+<h3>Comments</h3>
+{% for comment in question.comments.all %}
+  <div style="border-bottom: 1px solid #ddd; padding: 5px 0;">
+    <strong>{{ comment.user.username }}</strong> <small>{{ comment.created_at }}</small>
+    <p style="margin: 5px 0;">{{ comment.text }}</p>
+  </div>
+{% empty %}
+  <p>No comments yet. Be the first!</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+  <form action="{% url 'polls:add_comment' question.id %}" method="post" style="margin-top: 20px;">
+    {% csrf_token %}
+    <textarea name="comment_text" rows="3" style="width: 100%;" placeholder="Add a comment..." required></textarea><br>
+    <button type="submit">Post Comment</button>
+  </form>
+{% else %}
+  <p><a href="{% url 'login' %}">Log in</a> to post a comment.</p>
+{% endif %}
+
+{% endblock %}

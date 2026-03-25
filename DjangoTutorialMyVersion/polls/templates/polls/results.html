@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ question.question_text }}</h2>
+
+{% if total_votes %}
+  <p>Total Votes: {{ total_votes }}</p>
+  <div style="max-width: 600px; margin-top: 20px; margin-bottom: 20px;">
+  {% for item in choices_with_percentage %}
+    <div style="margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+        <strong>{{ item.choice_text }}</strong>
+        <span>{{ item.percentage }}% ({{ item.votes }} vote{{ item.votes|pluralize }})</span>
+      </div>
+      <div style="background: #e9ecef; border-radius: 5px; height: 20px; width: 100%; overflow: hidden;">
+        <div style="background: #007bff; width: {{ item.percentage }}%; height: 100%; transition: width 0.5s ease-in-out;"></div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{% else %}
+  <p>No votes yet.</p>
+{% endif %}
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+
+<hr>
+<h3>Comments</h3>
+<ul>
+{% for comment in question.comments.all %}
+  <li><strong>{{ comment.user.username }}:</strong> {{ comment.text }} <small>({{ comment.created_at }})</small></li>
+{% empty %}
+  <li>No comments yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}

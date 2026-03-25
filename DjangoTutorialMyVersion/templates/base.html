@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Django Polls{% endblock %}</title>
+</head>
+<body>
+  <header style="display: flex; justify-content: space-between; padding: 10px; background-color: #f8f9fa;">
+    <div>
+      <a href="{% url 'polls:index' %}" style="text-decoration: none; color: black; font-size: 24px;"><b>Django Polls</b></a>
+    </div>
+    <nav>
+      {% if user.is_authenticated %}
+        Hi, {{ user.username }}! |
+        {% if user.is_staff or user.is_superuser %}
+          <a href="{% url 'admin:index' %}" style="color: darkred; font-weight: bold;">Admin Panel</a> |
+        {% endif %}
+        <a href="{% url 'polls:profile' %}">Profilim</a> | 
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Logout</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a> | 
+        <a href="{% url 'polls:signup' %}">Sign Up</a>
+      {% endif %}
+    </nav>
+  </header>
+  
+  {% if messages %}
+    <ul class="messages" style="background-color: #d1ecf1; color: #0c5460; padding: 10px; list-style-type: none;">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <hr>
+  <main style="padding: 20px;">
+    {% block content %}
+    {% endblock %}
+  </main>
+</body>
+</html>
