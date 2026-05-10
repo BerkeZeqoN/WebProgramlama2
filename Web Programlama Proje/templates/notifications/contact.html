@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}İletişim — PULSE{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">📞 İletişim & Destek</h1>
+        <p class="page-subtitle">Sorularınız, teknik destek veya kurumsal talepleriniz için bize ulaşın</p>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Contact Form -->
+    <div class="card slide-up">
+        <div class="card-header">
+            <h2 class="card-title">Mesaj Gönderin</h2>
+        </div>
+        <form method="post" id="contact-form">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="form-group">
+                    <label class="form-label">Ad Soyad</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-posta Adresi</label>
+                    {{ form.email }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Konu</label>
+                {{ form.subject }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mesajınız</label>
+                {{ form.message }}
+            </div>
+            <button type="submit" class="btn btn-primary" id="contact-submit" style="width: 100%;">Mesajı Gönder</button>
+        </form>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="slide-up" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="card" style="flex: 1;">
+            <div class="card-header">
+                <h2 class="card-title">İletişim Bilgileri</h2>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(0, 240, 160, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">📍</div>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Merkez Ofis</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">Teknopark İstanbul, Kuluçka Merkezi<br>Pendik, İstanbul / Türkiye</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">✉️</div>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">E-posta</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">destek@pulseplatform.tech</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">📞</div>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Telefon</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">+90 (850) 123 45 67</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Sosyal Medyada Biz</h3>
+            <div style="display: flex; justify-content: center; gap: 1rem;">
+                <a href="#" class="btn btn-outline btn-sm" style="width: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">𝕏</a>
+                <a href="#" class="btn btn-outline btn-sm" style="width: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">in</a>
+                <a href="#" class="btn btn-outline btn-sm" style="width: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">IG</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

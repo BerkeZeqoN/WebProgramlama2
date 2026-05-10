@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Anketler — PULSE{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">◇ Anketler</h1>
+        <p class="page-subtitle">Aktif anketleri görüntüleyin ve yanıtlayın</p>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<form method="get" class="filter-bar" id="survey-filter-form">
+    <div class="search-input-wrapper">
+        <span class="search-icon">⌕</span>
+        <input type="text" name="q" class="form-input" placeholder="Anket ara..." value="{{ search_query }}" id="search-input">
+    </div>
+    <select name="category" class="filter-select" id="filter-category" onchange="this.form.submit()">
+        <option value="">Tüm Kategoriler</option>
+        {% for cat in categories %}
+        <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="priority" class="filter-select" id="filter-priority" onchange="this.form.submit()">
+        <option value="">Tüm Öncelikler</option>
+        <option value="CRITICAL" {% if current_priority == 'CRITICAL' %}selected{% endif %}>🔴 Kritik</option>
+        <option value="HIGH" {% if current_priority == 'HIGH' %}selected{% endif %}>🟠 Yüksek</option>
+        <option value="MEDIUM" {% if current_priority == 'MEDIUM' %}selected{% endif %}>🔵 Orta</option>
+        <option value="LOW" {% if current_priority == 'LOW' %}selected{% endif %}>🟢 Düşük</option>
+    </select>
+    <button type="submit" class="btn btn-outline btn-sm" id="filter-submit">Filtrele</button>
+</form>
+
+<!-- Survey Grid -->
+{% if surveys %}
+<div class="grid-3">
+    {% for survey in surveys %}
+    <div class="survey-card slide-up" style="animation-delay: {{ forloop.counter0 }}00ms">
+        <div class="survey-card-priority priority-{{ survey.priority|lower }}"></div>
+
+        <div class="survey-card-header">
+            <h3 class="survey-title">
+                <a href="{% url 'surveys:detail' slug=survey.slug %}" id="survey-{{ survey.id }}">{{ survey.title }}</a>
+            </h3>
+            <span class="badge badge-active">{{ survey.get_status_display }}</span>
+        </div>
+
+        {% if survey.category %}
+        <span class="badge badge-category" style="align-self: flex-start; margin-bottom: 0.5rem;">{{ survey.category.icon }} {{ survey.category.name }}</span>
+        {% endif %}
+
+        <p class="survey-description">{{ survey.description|truncatechars:120|default:"Açıklama eklenmemiş." }}</p>
+
+        <div class="survey-meta">
+            <span class="survey-meta-item">◈ {{ survey.total_questions }} Soru</span>
+            <span class="survey-meta-item">◇ {{ survey.total_responses }} Yanıt</span>
+            <span class="survey-meta-item">⏱ {{ survey.created_at|timesince }} önce</span>
+            {% if survey.location_name %}
+            <span class="survey-meta-item">📍 {{ survey.location_name }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">◇</div>
+    <h3 class="empty-title">Anket bulunamadı</h3>
+    <p class="empty-text">{% if search_query %}Aramanızla eşleşen anket bulunamadı.{% else %}Henüz aktif anket bulunmuyor.{% endif %}</p>
+    {% if search_query %}
+    <a href="{% url 'surveys:list' %}" class="btn btn-outline">Filtreleri Temizle</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

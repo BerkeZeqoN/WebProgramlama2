@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PULSE — Platform for Unified Live Survey & Emergency Response">
+    <meta name="theme-color" content="#0A1628">
+    <title>{% block title %}PULSE Platform{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- PULSE Styles -->
+    <link rel="stylesheet" href="{% static 'css/pulse.css' %}">
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    
+    <!-- Meta Tags -->
+    <meta property="og:title" content="PULSE Platform">
+    <meta property="og:description" content="Platform for Unified Live Survey & Emergency Response">
+    <meta property="og:type" content="website">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="main-navbar">
+        <div class="navbar-brand">
+            <a href="/" class="brand-link" id="brand-logo">
+                <span class="brand-icon">◉</span>
+                <span class="brand-text">PULSE</span>
+                <span class="brand-badge">v1.0</span>
+            </a>
+        </div>
+
+        <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+
+        <div class="navbar-menu" id="main-nav-menu">
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard:index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' and request.resolver_match.app_name == 'dashboard' %}active{% endif %}" id="nav-dashboard">
+                <span class="nav-icon">◈</span> Panel
+            </a>
+            <a href="{% url 'surveys:list' %}" class="nav-link {% if request.resolver_match.app_name == 'surveys' and request.resolver_match.url_name == 'list' %}active{% endif %}" id="nav-surveys">
+                <span class="nav-icon">◇</span> Anketler
+            </a>
+            <a href="{% url 'surveys:my_surveys' %}" class="nav-link {% if request.resolver_match.url_name == 'my_surveys' %}active{% endif %}" id="nav-my-surveys">
+                <span class="nav-icon">📋</span> Anketlerim
+            </a>
+            <a href="{% url 'dashboard:analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" id="nav-analytics">
+                <span class="nav-icon">📊</span> Analitik
+            </a>
+            <a href="{% url 'dashboard:map' %}" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}" id="nav-map">
+                <span class="nav-icon">🗺️</span> Harita
+            </a>
+            <a href="{% url 'dashboard:builder' %}" class="nav-link {% if request.resolver_match.url_name == 'builder' %}active{% endif %}" id="nav-builder">
+                <span class="nav-icon">🏗️</span> Oluştur
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="navbar-end">
+            {% if user.is_authenticated %}
+            <a href="{% url 'notifications:list' %}" class="nav-notif-btn" id="nav-notif-link" title="Bildirimler">
+                🔔
+                <span class="notif-badge" id="nav-notif-badge" data-count="0"></span>
+            </a>
+            <div class="user-menu" id="user-menu">
+                <button class="user-menu-trigger" id="user-menu-trigger" onclick="toggleUserMenu()">
+                    <span class="user-avatar">{{ user.get_initials }}</span>
+                    <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                    <span class="user-role-badge role-{{ user.role|lower }}">{{ user.get_role_display }}</span>
+                </button>
+                <div class="user-dropdown" id="user-dropdown">
+                    <a href="{% url 'accounts:profile' %}" class="dropdown-item" id="menu-profile">◈ Profil</a>
+                    <a href="{% url 'notifications:list' %}" class="dropdown-item" id="menu-notifs">🔔 Bildirimler</a>
+                    <a href="{% url 'dashboard:settings' %}" class="dropdown-item" id="menu-settings">⚙ Ayarlar</a>
+                    {% if user.is_admin or user.is_staff %}
+                    <a href="/admin/" class="dropdown-item" id="menu-admin">🛡️ Admin Panel</a>
+                    {% endif %}
+                    <hr class="dropdown-divider">
+                    <a href="{% url 'accounts:logout' %}" class="dropdown-item dropdown-item-danger" id="menu-logout">⏻ Güvenli Çıkış</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline" id="nav-login">Giriş Yap</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary" id="nav-register">Kayıt Ol</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container" id="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" id="alert-{{ forloop.counter }}">
+            <span class="alert-icon">
+                {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% elif message.tags == 'warning' %}⚠{% else %}ℹ{% endif %}
+            </span>
+            <span class="alert-text">{{ message }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="main-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="brand-icon">◉</span> PULSE Platform
+            </div>
+            <div class="footer-info">
+                Platform for Unified Live Survey & Emergency Response
+            </div>
+            <div class="footer-meta">
+                <span class="status-indicator status-online"></span>
+                Sistem Aktif — v1.0.0
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-top" id="scroll-top-btn" onclick="scrollToTop()" title="Yukarı Çık">
+        ↑
+    </button>
+
+    <!-- PULSE Scripts -->
+    <script src="{% static 'js/pulse.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
