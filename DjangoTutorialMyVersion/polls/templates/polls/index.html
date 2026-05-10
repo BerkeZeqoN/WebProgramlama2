@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+  <form method="get" action="{% url 'polls:index' %}">
+    <input type="text" name="q" placeholder="Search polls..." value="{{ search_query }}">
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+</div>
+
+{% if trending_polls %}
+  <div style="background: #f9f9f9; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #007bff;">
+    <h3 style="margin-top: 0;">🔥 Günün Popüler Anketleri</h3>
+    <ul style="list-style-type: none; padding: 0;">
+      {% for poll in trending_polls %}
+        <li style="margin-bottom: 8px;">
+          <strong>#{{ forloop.counter }}</strong> - 
+          <a href="{% url 'polls:detail' poll.id %}">{{ poll.question_text }}</a>
+          <small style="color: grey;">({{ poll.total_votes }} oy)</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
+        {% if question.category %} <span style="background: #eee; padding: 2px 5px; border-radius: 3px; font-size: 0.8em;">{{ question.category.name }}</span>{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    
+    <div style="margin-top: 20px;">
+      {% if page_obj.has_previous %}
+        <a href="?page=1&q={{ search_query }}&category={{ selected_category }}">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&category={{ selected_category }}">previous</a>
+      {% endif %}
+
+      <span style="margin: 0 10px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&category={{ selected_category }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}&category={{ selected_category }}">last &raquo;</a>
+      {% endif %}
+    </div>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+{% endblock %}
